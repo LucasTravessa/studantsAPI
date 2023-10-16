@@ -1,91 +1,80 @@
-const pool = require('../../db')
-const querires = require('./queries')
+const { PrismaClient } = require("@prisma/client");
 
-const getStudents = (req, res) => {
-    pool.query(querires.getStudents, (error, results) => {
-        if(error) {
-            throw error
-        }
-        res.status(200).json(results.rows)
-    })
-}
+const prisma = new PrismaClient();
 
-const getStudentById = (req, res) => {
-    const id = parseInt(req.params.id);
+const getStudents = async (req, res) => {
+  try {
+    const students = await prisma.students.findMany();
+    res.status(200).json(students);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};
 
-    pool.query(querires.getStudentById, [id], (error, results) => {
-        if(error) {
-            throw error
-        }
-        res.status(200).json(results.rows)
-    })
-} 
+const getStudentById = async (req, res) => {
+  const id = parseInt(req.params.id);
 
-const createStudent = (req, res) => {
-    const { name, email, age, dob } = req.body
+  try {
+    const student = await prisma.students.findUnique({ where: { id: id } });
+    res.status(200).json(student);
+  } catch (error) {
+    res.status(404).json({ msg: error.message });
+  }
+};
 
-    //check if email exists
-    pool.query(querires.checkEmailExists, [email], (error, results) => {
-        if(results.rows.length) {
-            res.status(409).send('Email already exists')
-        }
+const createStudent = async (req, res) => {
+  const { name, email, age } = req.body;
+  try {
+    const student = await prisma.students.create({
+      data: {
+        name: name,
+        email: email,
+        age: age,
+      },
+    });
 
-        //add student to db
-        pool.query(querires.createStudent, [name, email, age, dob], (error, results) => {
-            if(error) {
-                throw error
-            }
-            res.status(201).send('Student created successfully')
-        })
-    })
+    res.status(201).json(student);
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
 
-}
+const deleteStudent = async (req, res) => {
+  const id = parseInt(req.params.id);
 
-const deleteStudent = (req, res) => {
-    const id = parseInt(req.params.id);
-
-    pool.query(querires.getStudentById, [id], (error, results) => {
-        const noStudentsFound = !results.rows.length;
-        if (noStudentsFound){
-            res.status(404).send("Student does not exist in the db")
-        }
-
-        pool.query(querires.deleteStudent, [id], (error, results) => {
-            if (error) {
-                throw error
-            }
-            res.status(200).send("Student deleted successfully")
-            
-        })
-        
-    })
-}
+  try {
+    const student = await prisma.students.delete({
+      where: { id: id },
+    });
+    res.status(200).send("Student deleted successfully", student);
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
 
 const updateStudent = (req, res) => {
-    const id = parseInt(req.params.id);
-    const { name, email, age, dob } = req.body
+  const id = parseInt(req.params.id);
+  const { name, email, age } = req.body;
 
-    pool.query(querires.getStudentById, [id], (error, results) => {
-        const noStudentsFound = !results.rows.length;
-        if (noStudentsFound){
-            res.status(404).send("Student does not exist in the db")
-        }
-
-        pool.query(querires.updateStudent, [name, email, age, dob, id], (error, results) => {
-            if (error) {
-                throw error
-            }
-            res.status(200).send("Student updated successfully")
-            
-        })
-        
-    })
-}
+  try {
+    const student = prisma.students.update({
+      where: { id: id },
+      data: {
+        name: name,
+        email: email,
+        age: age,
+      },
+    });
+    res.status(200).send("Student updated successfully", student);
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
 
 module.exports = {
-    getStudents,
-    getStudentById,
-    createStudent,
-    deleteStudent,
-    updateStudent
-}
+  getStudents,
+  getStudentById,
+  createStudent,
+  deleteStudent,
+  updateStudent,
+};

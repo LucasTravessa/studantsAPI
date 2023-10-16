@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: students_backend
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - my-school
+    restart: always
+    volumes:
+      - .:/usr/src/app
+    build:
+      context: .
+
+  postgres:
+    container_name: students_postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: students
+    volumes:
+      - ./data:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - my-school
+    restart: always
+
+networks:
+  my-school:
+    driver: bridge
