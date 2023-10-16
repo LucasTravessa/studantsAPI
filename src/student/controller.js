@@ -23,13 +23,14 @@ const getStudentById = async (req, res) => {
 };
 
 const createStudent = async (req, res) => {
-  const { name, email, age } = req.body;
+  const { name, email, age, dob } = req.body;
   try {
     const student = await prisma.students.create({
       data: {
         name: name,
         email: email,
         age: age,
+        dob: dob,
       },
     });
 
@@ -54,7 +55,7 @@ const deleteStudent = async (req, res) => {
 
 const updateStudent = (req, res) => {
   const id = parseInt(req.params.id);
-  const { name, email, age } = req.body;
+  const { name, email, age, dob } = req.body;
 
   try {
     const student = prisma.students.update({
@@ -63,6 +64,7 @@ const updateStudent = (req, res) => {
         name: name,
         email: email,
         age: age,
+        dob: dob,
       },
     });
     res.status(200).send("Student updated successfully", student);
