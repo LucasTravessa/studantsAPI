@@ -37,7 +37,9 @@ Follow the steps below to install the project in your development environment:
 After installation, you can run the StudantsAPI application with the following command:
 
 ```
-docker compose up
+docker compose up -d
+
+npx prisma migrate dev --name init
 ```
 
 The application will be accessible at `http://localhost:8080`.

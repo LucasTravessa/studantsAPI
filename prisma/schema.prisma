@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -10,12 +11,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Students{
-  id Int @id @default(autoincrement())
-  name String
+model Students {
+  id    Int    @id @default(autoincrement())
+  name  String
   email String @unique
-  age Int
-  dob String
+  age   Int
+  dob   String
 
   @@map("students")
 }

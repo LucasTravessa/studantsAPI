@@ -9,11 +9,13 @@ services:
       - "8080:8080"
     networks:
       - my-school
-    restart: always
     volumes:
       - .:/usr/src/app
     build:
       context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/students
 
   postgres:
     container_name: students_postgres
